@@ -2,6 +2,15 @@
 
 A comprehensive suite of medical AI benchmarks for evaluating Large Language Model (LLM) performance on clinical tasks.
 
+## TL;DR: My Updates
+
+Updated triage bench to support newly released GPT-5 models, as well as a variety of open source models through Groq (Qwen, Llama, Kimi, etc.). To use, go to [https://groq.com/](https://groq.com/) and create a free account to get an API key. The app can be found in triage-bench/ui.py. To use, run
+```bash
+cd triage-bench
+python3 ui.py
+```
+A local URL will be printed to terminal, open this in a browser to begin using. 
+
 ## Overview
 
 This repository contains multiple medical AI benchmarks developed by MedAsk to evaluate and compare the performance of LLMs on various medical tasks:
@@ -46,6 +55,8 @@ medask-benchmarks/
 └── triage_bench/               # Medical triage benchmark  
     ├── README.md               # Detailed usage instructions
     ├── main.py                 # Main evaluation script
+    ├── benchmark_runner.py     # Helper to the script below; effectively does main.py
+    ├── ui.py                   # Creates the web UI
     ├── paired_analysis.py      # Statistical comparison tool
     ├── vignettes/              # Clinical vignettes
     └── results/                # Triage evaluation results
@@ -68,6 +79,7 @@ pip install -e .
 # Set API keys
 export KEY_OPENAI="sk-..."     # For OpenAI models
 export KEY_DEEPSEEK="..."      # For DeepSeek models
+export KEY_GROQ="..."
 ```
 
 ### Running Benchmarks
