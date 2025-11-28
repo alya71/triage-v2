@@ -3,6 +3,7 @@ Refactored benchmark runner that supports progress callbacks for web UI.
 """
 import json
 import os
+import random
 import re
 from collections import Counter
 from typing import Callable, Dict, List, Optional, Tuple
@@ -44,7 +45,7 @@ def create_client(model: str) -> BaseUmmon:
     - Together AI models: together+<model-name>
     """
     # OpenAI models
-    if model in {"o1", "o1-mini", "o3", "o3-mini", "o4-mini", "gpt-4o", "gpt-4.5-preview"} or model.startswith('gpt'):
+    if model in {"o1", "o1-mini", "o3", "o3-mini", "o4-mini", "gpt-4o", "gpt-4.5-preview"}:
         from medask.ummon.openai import UmmonOpenAI
         return UmmonOpenAI(model)
     
@@ -123,13 +124,23 @@ def run_benchmark(
         raise FileNotFoundError(f"Vignette file not found: {vignette_fp}")
     
     with open(vignette_fp, encoding="utf-8") as f:
-        vignettes = [json.loads(l) for l in f]
+        all_vignettes = [json.loads(l) for l in f]
     
-    # Limit vignettes if specified
+    total_available = len(all_vignettes)
+    
+    # Validate num_vignettes
     if num_vignettes is not None:
-        vignettes = vignettes[:num_vignettes]
+        if num_vignettes > total_available:
+            raise ValueError(f"Only {total_available} vignettes exist, but {num_vignettes} were requested.")
+        if num_vignettes <= 0:
+            raise ValueError("Number of vignettes must be positive or None for all vignettes.")
     
-    num_cases = len(vignettes)
+    # If num_vignettes is None, use all vignettes
+    if num_vignettes is None:
+        num_cases = total_available
+    else:
+        num_cases = num_vignettes
+    
     total_tasks = num_cases * runs
     
     # Initialize counters
@@ -144,6 +155,12 @@ def run_benchmark(
     
     # Run benchmark
     for run in range(1, runs + 1):
+        # Sample vignettes for this run (different sample per run if num_vignettes < total)
+        if num_vignettes is None:
+            vignettes = all_vignettes
+        else:
+            vignettes = random.sample(all_vignettes, num_vignettes)
+        
         for idx, v in enumerate(vignettes, 1):
             # Evaluate single case
             pred = _llm_triage(client, v["case_description"])
