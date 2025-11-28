@@ -74,14 +74,17 @@ def evaluate_single(case_id: int,
     out_file.write(json.dumps(rec, ensure_ascii=False) + "\n")
     return rec
 
+OLD_CHOICES = ["o1", "o1-mini", "o3", "o3-mini", "o4-mini", "gpt-4o", "gpt-4.5-preview", "deepseek-chat", "deepseek-reasoner"]
+GROQ_CHOICES = ['kimi-k2-instruct-0905', 'allam-2-7b', 'qwen3-32b', 'gpt-oss-20b', 'llama-4-scout-17b-16e-instruct', 'llama-3.1-8b-instant', 'llama-4-maverick-17b-128e-instruct', 'compound', 'llama-3.3-70b-versatile', 'gpt-oss-120b', 'compound-mini', 'kimi-k2-instruct']
+CHOICES = OLD_CHOICES + GROQ_CHOICES
+
 # ───────────────────────── Main ───────────────────────────
 
 
 def main():
     parser = argparse.ArgumentParser("LLM triage benchmark – paired logging, fixed counters")
-    parser.add_argument("--model", 
-                        default="deepseek-chat",
-                        help="Model name. Examples: 'gpt-4o', 'deepseek-chat', 'groq+llama-3.1-70b-versatile', 'together+meta-llama/Llama-3-70b-chat-hf'")
+    parser.add_argument("--model", choices=CHOICES,
+                        default="deepseek-chat")
     parser.add_argument("--vignette_set", choices=["semigran"], default="semigran")
     parser.add_argument("--runs", type=int, default=1, help="How many stochastic passes per vignette")
     args = parser.parse_args()

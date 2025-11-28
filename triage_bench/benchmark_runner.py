@@ -13,6 +13,7 @@ from medask.ummon.base import BaseUmmon
 from medask.ummon.deepseek import UmmonDeepSeek
 from medask.ummon.openai import UmmonOpenAI
 
+
 TRIAGE_ORDER = {"sc": 1, "ne": 2, "em": 3}
 TRIAGE_LEVELS = ["em", "ne", "sc"]
 
@@ -48,22 +49,39 @@ def create_client(model: str) -> BaseUmmon:
     if model in {"o1", "o1-mini", "o3", "o3-mini", "o4-mini", "gpt-4o", "gpt-4.5-preview"}:
         return UmmonOpenAI(model)
     
-    # Groq models
-    elif model.startswith("groq+"):
-        from medask.ummon.groq import UmmonGroq
-        groq_model = model[len("groq+"):]
-        return UmmonGroq(groq_model)
-    
-    # Together AI models
-    elif model.startswith("together+"):
-        from medask.ummon.together import UmmonTogether
-        together_model = model[len("together+"):]
-        return UmmonTogether(together_model)
-    
-    # DeepSeek models (default)
-    else:
+    # Deepseek models
+    elif model in {"deepseek-chat", "deepseek-reasoner"}:
         return UmmonDeepSeek(model)
-
+    # Groq models
+    else:
+        from medask.ummon.groq import UmmonGroq
+        try:
+            if model == "qwen3-32b":
+                model = "qwen/qwen3-32b"
+            elif model == "kimi-k2-instruct-0905":
+                model = "moonshotai/kimi-k2-instruct-0905"
+            elif model == "gpt-oss-20b":
+                model = "openai/gpt-oss-20b"
+            elif model == "kimi-k2-instruct":
+                model = "moonshotai/kimi-k2-instruct"
+            elif model == "compound-mini":
+                model = "groq/compound-mini"
+            elif model == "gpt-oss-120b":
+                model = "openai/gpt-oss-120b"
+            elif model == "compound":
+                model = "groq/compound"
+            elif model == "meta-llama/llama-4-maverick-17b-128e-instruct":
+                model = 'meta-llama/llama-4-maverick-17b-128e-instruct'
+            elif model == "llama-4-scout-17b-16e-instruct":
+                model = "meta-llama/llama-4-scout-17b-16e-instruct"
+            elif model == "gpt-oss-20b":
+                model = "openai/gpt-oss-20b"
+            return UmmonGroq(model)
+        except Exception as e: 
+            GROQ_CHOICES = ['kimi-k2-instruct-0905', 'allam-2-7b', 'qwen3-32b', 'gpt-oss-20b', 'llama-4-scout-17b-16e-instruct', 'llama-3.1-8b-instant', 'llama-4-maverick-17b-128e-instruct', 'compound', 'llama-3.3-70b-versatile', 'gpt-oss-120b', 'compound-mini', 'kimi-k2-instruct']
+            raise ValueError(f"Not a valid Groq model: '{model}', valid models with chat completion feature are {GROQ_CHOICES}") from e
+    
+    
 
 def _llm_triage(client: BaseUmmon, vignette_text: str) -> str:
     """Get triage classification from LLM."""
