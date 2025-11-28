@@ -4,7 +4,7 @@ A comprehensive suite of medical AI benchmarks for evaluating Large Language Mod
 
 ## TL;DR: My Updates
 
-Updated triage bench to support newly released GPT-5 models, as well as a variety of open source models through Groq (Qwen, Llama, Kimi, etc.). To use, go to [https://groq.com/](https://groq.com/) and create a free account to get an API key. The app can be found in triage-bench/ui.py. To use, run
+Updated triage bench to support newly released GPT-5 models, as well as a variety of open source models through Groq (Qwen, Llama, Kimi, etc.). To use, go to [https://groq.com/](https://groq.com/) and create a free account to get an API key. The app can be found in triage-bench/ui.py. To use, follow the instructions below  under installation (export KEY instructions optional) and run
 ```bash
 cd triage-bench
 python3 ui.py
@@ -15,7 +15,7 @@ A local URL will be printed to terminal, open this in a browser to begin using.
 
 ui.py is written using Gradio, which I chose because Streamlit doesn't seem to have the function to have a progress bar, and it's simpler than React/Next.js. Currently, it's set up so that you can enter API keys either on the web interface, or by using the previous method (typing export KEY_{provider}="..." in terminal).  I used Groq to access the open source models since currently the free plan gives you decent access, albeit with [rate limits](https://console.groq.com/docs/rate-limits). 
 
-I also made a few improvements on the old code. Previously, you had to input an OpenAI key, even if you weren't using any of the OpenAI models. Now, you only have to input keys for the providers that you will use the models of. The old code also didn't work with the reasoning OAI models, and I made a small tweak so it does now. 
+I also made a few improvements on the old code. Previously, you had to input an OpenAI key, even if you weren't using any of the OpenAI models, or else it would raise an error. Now, if you only want to use Deepseek / Groq models, you only have to input Deepseek / Groq keys. The old code also didn't work with the reasoning OAI models, and I fixed that as well. 
 
 ## Overview
 
@@ -106,7 +106,7 @@ For detailed usage instructions, see the README files in each benchmark director
 
 ## Supported Models
 
-- **OpenAI**: GPT-4o, GPT-4.5, O1, O3 series
+- **OpenAI**: GPT-5, GPT-4o, O1, O3 series
 - **DeepSeek**: DeepSeek Chat, DeepSeek Reasoner
 - **MedAsk**: Proprietary medical AI models
 
