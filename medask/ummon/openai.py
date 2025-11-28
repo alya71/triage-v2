@@ -3,7 +3,7 @@ from logging import getLogger
 from time import sleep
 from typing import Dict, List, Optional
 
-from openai import OpenAI, RateLimitError
+from openai import OpenAI, RateLimitError, BadRequestError
 
 from medask.models.comms.models import CMessage
 from medask.models.orm.models import Lang, Role
@@ -18,13 +18,18 @@ client = OpenAI(api_key=os.environ.get("KEY_OPENAI", ""), timeout=40)
 class UmmonOpenAI(BaseUmmon):
     def __init__(self, model: Optional[str] = None) -> None:
         self._model = model or "gpt-4o-mini"
+        # Track if we've already determined this model doesn't support temperature
+        self._temperature_supported = True
 
     def _converse_raw(self, history: List[Dict[str, str]], json: bool) -> str:
         params = dict(
             model=self._model,
             messages=history,
-            temperature=0.6,
         )
+        # Only add temperature if we haven't determined it's unsupported
+        if self._temperature_supported:
+            params["temperature"] = 0.6
+        
         if json:
             params["response_format"] = {"type": "json_object"}
 
@@ -33,6 +38,15 @@ class UmmonOpenAI(BaseUmmon):
             try:
                 completion = client.chat.completions.create(**params)
                 return completion.choices[0].message.content
+            except BadRequestError as e:
+                # If temperature is not supported, retry without it and remember for future calls
+                error_msg = str(e).lower()
+                if "temperature" in error_msg and "temperature" in params and self._temperature_supported:
+                    logger.info(f"Model {self._model} doesn't support temperature parameter, using default.")
+                    self._temperature_supported = False
+                    params.pop("temperature", None)
+                    continue
+                raise
             except RateLimitError:
                 logger.info(f"Rate limit, sleeping for {round(slep, 1)} seconds.")
                 sleep(slep)

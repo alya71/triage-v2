@@ -39,21 +39,19 @@ def create_client(model: str) -> BaseUmmon:
     Create appropriate client based on model string.
     
     Supports:
-    - OpenAI models: o1, o1-mini, o3, o3-mini, o4-mini, gpt-4o, gpt-4.5-preview
+    - OpenAI models: "gpt-4o", "gpt-5.1", "gpt-5-mini", "gpt-5-nano", "o1", "o1-mini", "o3", "o3-mini", "o4-mini"
     - DeepSeek models: deepseek-chat, deepseek-reasoner
     - Groq models: groq+<model-name>
     - Together AI models: together+<model-name>
     """
-    # OpenAI models
-    if model in {"o1", "o1-mini", "o3", "o3-mini", "o4-mini", "gpt-4o", "gpt-4.5-preview"}:
+    if model in {"o1", "o1-mini", "o3", "o3-mini", "o4-mini", "gpt-4o", "gpt-5.1", "gpt-5-mini", "gpt-5-nano"}:
         from medask.ummon.openai import UmmonOpenAI
         return UmmonOpenAI(model)
     
-    # Deepseek models
     elif model in {"deepseek-chat", "deepseek-reasoner"}:
         from medask.ummon.deepseek import UmmonDeepSeek
         return UmmonDeepSeek(model)
-    # Groq models
+
     else:
         from medask.ummon.groq import UmmonGroq
         try:

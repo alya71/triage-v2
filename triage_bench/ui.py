@@ -6,7 +6,7 @@ import gradio as gr
 from benchmark_runner import run_benchmark, TRIAGE_LEVELS
 
 # Model choices organized by provider
-OPENAI_MODELS = ["o1", "o1-mini", "o3", "o3-mini", "o4-mini", "gpt-4o", "gpt-4.5-preview"]
+OPENAI_MODELS = ["o1", "o1-mini", "o3", "o3-mini", "o4-mini", "gpt-4o", "gpt-5.1", "gpt-5-mini", "gpt-5-nano"]
 DEEPSEEK_MODELS = ["deepseek-chat", "deepseek-reasoner"]
 GROQ_MODELS = ['kimi-k2-instruct-0905', 'allam-2-7b', 'qwen3-32b', 'gpt-oss-20b', 'llama-4-scout-17b-16e-instruct', 'llama-3.1-8b-instant', 'llama-4-maverick-17b-128e-instruct', 'compound', 'llama-3.3-70b-versatile', 'gpt-oss-120b', 'compound-mini', 'kimi-k2-instruct']
 
@@ -74,7 +74,7 @@ def submit_api_key(key, key_type):
 
 def run_benchmark_ui(model, runs, num_vignettes, key_openai, key_deepseek, key_groq, progress=gr.Progress()):
     """
-    Run benchmark with Gradio progress tracking.
+    Run benchmark with progress tracking.
     
     Args:
         model: Model name from dropdown
@@ -105,7 +105,7 @@ def run_benchmark_ui(model, runs, num_vignettes, key_openai, key_deepseek, key_g
     # Since ummon modules now read from os.environ directly, we just need to reload the module
     try:
         import importlib
-        if model in {"o1", "o1-mini", "o3", "o3-mini", "o4-mini", "gpt-4o", "gpt-4.5-preview"}:
+        if model in {"o1", "o1-mini", "o3", "o3-mini", "o4-mini", "gpt-4o", "gpt-5.1", "gpt-5-mini", "gpt-5-nano"}:
             import medask.ummon.openai
             importlib.reload(medask.ummon.openai)
         elif model in {"deepseek-chat", "deepseek-reasoner"}:
@@ -274,7 +274,7 @@ def create_ui():
                 num_vignettes_input = gr.Number(
                     value=45,
                     label="Number of Vignettes",
-                    info="There are 45 vignettes in total",
+                    info="Leave empty or set to 45 to use all vignettes",
                     precision=0
                 )
                 
@@ -303,7 +303,7 @@ def create_ui():
         def run_with_progress(model, runs, num_vignettes, key_openai_stored, key_deepseek_stored, key_groq_stored, progress=gr.Progress()):
             """Wrapper to run benchmark with progress tracking."""
             if not model:
-                return "Error: Please select a model.", "Error: No model selected"
+                return "Error: Please select a model.", "Benchmark not started"
             
             result, status = run_benchmark_ui(
                 model, runs, num_vignettes, 
