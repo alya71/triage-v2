@@ -10,10 +10,9 @@ from collections import Counter
 from tqdm import tqdm
 
 # ───── LLM client imports (keep your project paths) ────────
-from medask.ummon.openai import UmmonOpenAI
-from medask.ummon.deepseek import UmmonDeepSeek
 from medask.models.comms.models import CMessage
 from medask.models.orm.models import Role
+from benchmark_runner import create_client
 # ───────────────────────────────────────────────────────────
 
 logger = logging.getLogger("benchmark.triage_benchmark")
@@ -80,17 +79,19 @@ def evaluate_single(case_id: int,
 
 def main():
     parser = argparse.ArgumentParser("LLM triage benchmark – paired logging, fixed counters")
-    parser.add_argument("--model", choices=["o1", "o1-mini", "o3", "o3-mini", "o4-mini", "gpt-4o", "gpt-4.5-preview", "deepseek-chat", "deepseek-reasoner"],
-                        default="deepseek-chat")
-    parser.add_argument("--vignette_set", choices=["semigran", "kopka"], default="semigran")
+    parser.add_argument("--model", 
+                        default="deepseek-chat",
+                        help="Model name. Examples: 'gpt-4o', 'deepseek-chat', 'groq+llama-3.1-70b-versatile', 'together+meta-llama/Llama-3-70b-chat-hf'")
+    parser.add_argument("--vignette_set", choices=["semigran"], default="semigran")
     parser.add_argument("--runs", type=int, default=1, help="How many stochastic passes per vignette")
     args = parser.parse_args()
 
     # Client factory
     if args.model in {"o1", "o1-mini", "o3", "o3-mini", "o4-mini", "gpt-4o", "gpt-4.5-preview"}:
+        from medask.ummon.openai import UmmonOpenAI
         client = UmmonOpenAI(args.model)
     else:
-        client = UmmonDeepSeek(args.model)
+        client = create_client(args.model)
 
     vignette_fp = os.path.join(os.path.dirname(os.path.abspath(__file__)), "vignettes",
                                f"{args.vignette_set}_vignettes.jsonl")

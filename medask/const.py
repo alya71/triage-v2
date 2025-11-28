@@ -18,3 +18,6 @@ KEY_MISTRAL = environ.get("KEY_MISTRAL", "")
 
 # API key for deepseek. Needed only for benchmarking.
 KEY_DEEPSEEK = environ.get("KEY_DEEPSEEK", "")
+
+# API key for groq. Needed only for benchmarking
+KEY_GROQ = environ.get("KEY_GROQ", "")
