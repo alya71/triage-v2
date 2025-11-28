@@ -8,8 +8,23 @@ from benchmark_runner import run_benchmark, TRIAGE_LEVELS
 # Model choices organized by provider
 OPENAI_MODELS = ["o1", "o1-mini", "o3", "o3-mini", "o4-mini", "gpt-4o", "gpt-5.1", "gpt-5-mini", "gpt-5-nano"]
 DEEPSEEK_MODELS = ["deepseek-chat", "deepseek-reasoner"]
-GROQ_MODELS = ['kimi-k2-instruct-0905', 'allam-2-7b', 'qwen3-32b', 'gpt-oss-20b', 'llama-4-scout-17b-16e-instruct', 'llama-3.1-8b-instant', 'llama-4-maverick-17b-128e-instruct', 'compound', 'llama-3.3-70b-versatile', 'gpt-oss-120b', 'compound-mini', 'kimi-k2-instruct']
+GROQ_MODEL_CREATORS = {
+    'kimi-k2-instruct-0905': 'moonshotai',
+    'kimi-k2-instruct': 'moonshotai',
+    'qwen3-32b': 'qwen',
+    'gpt-oss-20b': 'openai',
+    'gpt-oss-120b': 'openai',
+    'compound-mini': 'groq',
+    'compound': 'groq',
+    'llama-4-scout-17b-16e-instruct': 'meta-llama',
+    'llama-4-maverick-17b-128e-instruct': 'meta-llama',
+    'llama-3.1-8b-instant': 'meta-llama',  # llama models are typically meta-llama
+    'llama-3.3-70b-versatile': 'meta-llama',  # llama models are typically meta-llama
+    'allam-2-7b': 'groq',  # Default to groq if not specified
+}
 
+GROQ_MODELS_RAW = ['kimi-k2-instruct-0905', 'allam-2-7b', 'qwen3-32b', 'gpt-oss-20b', 'llama-4-scout-17b-16e-instruct', 'llama-3.1-8b-instant', 'llama-4-maverick-17b-128e-instruct', 'compound', 'llama-3.3-70b-versatile', 'gpt-oss-120b', 'compound-mini', 'kimi-k2-instruct']
+GROQ_MODELS = [(f"{model} ({GROQ_MODEL_CREATORS.get(model, 'groq')})", model) for model in GROQ_MODELS_RAW]
 PROVIDER_MODELS = {
     "OpenAI": OPENAI_MODELS,
     "DeepSeek": DEEPSEEK_MODELS,
