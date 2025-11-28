@@ -10,8 +10,6 @@ from typing import Callable, Dict, List, Optional, Tuple
 from medask.models.comms.models import CMessage
 from medask.models.orm.models import Role
 from medask.ummon.base import BaseUmmon
-from medask.ummon.deepseek import UmmonDeepSeek
-from medask.ummon.openai import UmmonOpenAI
 
 
 TRIAGE_ORDER = {"sc": 1, "ne": 2, "em": 3}
@@ -47,10 +45,12 @@ def create_client(model: str) -> BaseUmmon:
     """
     # OpenAI models
     if model in {"o1", "o1-mini", "o3", "o3-mini", "o4-mini", "gpt-4o", "gpt-4.5-preview"}:
+        from medask.ummon.openai import UmmonOpenAI
         return UmmonOpenAI(model)
     
     # Deepseek models
     elif model in {"deepseek-chat", "deepseek-reasoner"}:
+        from medask.ummon.deepseek import UmmonDeepSeek
         return UmmonDeepSeek(model)
     # Groq models
     else:
