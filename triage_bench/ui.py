@@ -8,6 +8,7 @@ from benchmark_runner import run_benchmark, TRIAGE_LEVELS
 # Model choices organized by provider
 OPENAI_MODELS = ["o1", "o1-mini", "o3", "o3-mini", "o4-mini", "gpt-4o", "gpt-5.1", "gpt-5-mini", "gpt-5-nano"]
 DEEPSEEK_MODELS = ["deepseek-chat", "deepseek-reasoner"]
+# so we can display provider behind model name
 GROQ_MODEL_CREATORS = {
     'kimi-k2-instruct-0905': 'moonshotai',
     'kimi-k2-instruct': 'moonshotai',
@@ -18,10 +19,10 @@ GROQ_MODEL_CREATORS = {
     'compound': 'groq',
     'llama-4-scout-17b-16e-instruct': 'meta-llama',
     'llama-4-maverick-17b-128e-instruct': 'meta-llama',
-    'llama-3.1-8b-instant': 'meta-llama',  # llama models are typically meta-llama
-    'llama-3.3-70b-versatile': 'meta-llama',  # llama models are typically meta-llama
-    'allam-2-7b': 'groq',  # Default to groq if not specified
-}
+    'llama-3.1-8b-instant': 'meta-llama', 
+    'llama-3.3-70b-versatile': 'meta-llama',  
+    'allam-2-7b': 'groq', 
+} 
 
 GROQ_MODELS_RAW = ['kimi-k2-instruct-0905', 'allam-2-7b', 'qwen3-32b', 'gpt-oss-20b', 'llama-4-scout-17b-16e-instruct', 'llama-3.1-8b-instant', 'llama-4-maverick-17b-128e-instruct', 'compound', 'llama-3.3-70b-versatile', 'gpt-oss-120b', 'compound-mini', 'kimi-k2-instruct']
 GROQ_MODELS = [(f"{model} ({GROQ_MODEL_CREATORS.get(model, 'groq')})", model) for model in GROQ_MODELS_RAW]
@@ -100,7 +101,6 @@ def run_benchmark_ui(model, runs, num_vignettes, key_openai, key_deepseek, key_g
         key_groq: Groq API key (optional)
         progress: Gradio progress tracker
     """
-    # Convert empty string/None/0 to None for num_vignettes (use all)
     if num_vignettes == "" or num_vignettes is None or num_vignettes == 0:
         num_vignettes = None
     elif num_vignettes > 45:
@@ -108,7 +108,7 @@ def run_benchmark_ui(model, runs, num_vignettes, key_openai, key_deepseek, key_g
     elif num_vignettes <= 0:
         return "Error: Number of vignettes must be positive or empty for all vignettes.", "Error"
     
-    # Set API keys in environment if provided
+    # Set API keys in environment if they have already been added
     if key_openai and key_openai.strip():
         os.environ["KEY_OPENAI"] = key_openai.strip()
     if key_deepseek and key_deepseek.strip():
@@ -116,8 +116,6 @@ def run_benchmark_ui(model, runs, num_vignettes, key_openai, key_deepseek, key_g
     if key_groq and key_groq.strip():
         os.environ["KEY_GROQ"] = key_groq.strip()
     
-    # Reload the specific ummon module that will be used to recreate client with new API key
-    # Since ummon modules now read from os.environ directly, we just need to reload the module
     try:
         import importlib
         if model in {"o1", "o1-mini", "o3", "o3-mini", "o4-mini", "gpt-4o", "gpt-5.1", "gpt-5-mini", "gpt-5-nano"}:

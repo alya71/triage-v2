@@ -1,6 +1,3 @@
-"""
-Refactored benchmark runner that supports progress callbacks for web UI.
-"""
 import json
 import os
 import random
@@ -37,12 +34,6 @@ Vignette:
 def create_client(model: str) -> BaseUmmon:
     """
     Create appropriate client based on model string.
-    
-    Supports:
-    - OpenAI models: "gpt-4o", "gpt-5.1", "gpt-5-mini", "gpt-5-nano", "o1", "o1-mini", "o3", "o3-mini", "o4-mini"
-    - DeepSeek models: deepseek-chat, deepseek-reasoner
-    - Groq models: groq+<model-name>
-    - Together AI models: together+<model-name>
     """
     if model in {"o1", "o1-mini", "o3", "o3-mini", "o4-mini", "gpt-4o", "gpt-5.1", "gpt-5-mini", "gpt-5-nano"}:
         from medask.ummon.openai import UmmonOpenAI
@@ -55,6 +46,8 @@ def create_client(model: str) -> BaseUmmon:
     else:
         from medask.ummon.groq import UmmonGroq
         try:
+            # basically, if you don't do this, it will try to make a new folder when outputting the results
+            # i probably could've done this in a smarter way
             if model == "qwen3-32b":
                 model = "qwen/qwen3-32b"
             elif model == "kimi-k2-instruct-0905":
@@ -111,10 +104,9 @@ def run_benchmark(
     Returns:
         Tuple of (summary_metrics, results_list)
     """
-    # Create client
+    # set up
     client = create_client(model)
     
-    # Load vignettes
     vignette_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "vignettes")
     vignette_fp = os.path.join(vignette_dir, f"{vignette_set}_vignettes.jsonl")
     
@@ -126,14 +118,12 @@ def run_benchmark(
     
     total_available = len(all_vignettes)
     
-    # Validate num_vignettes
     if num_vignettes is not None:
         if num_vignettes > total_available:
             raise ValueError(f"Only {total_available} vignettes exist, but {num_vignettes} were requested.")
         if num_vignettes <= 0:
             raise ValueError("Number of vignettes must be positive or None for all vignettes.")
     
-    # If num_vignettes is None, use all vignettes
     if num_vignettes is None:
         num_cases = total_available
     else:
@@ -141,7 +131,6 @@ def run_benchmark(
     
     total_tasks = num_cases * runs
     
-    # Initialize counters
     total_pred_counter = Counter()
     per_level_total = Counter()
     per_level_correct = Counter()
@@ -151,16 +140,15 @@ def run_benchmark(
     
     completed = 0
     
-    # Run benchmark
+    # doing runs
     for run in range(1, runs + 1):
-        # Sample vignettes for this run (different sample per run if num_vignettes < total)
+        # random sampling
         if num_vignettes is None:
             vignettes = all_vignettes
         else:
             vignettes = random.sample(all_vignettes, num_vignettes)
         
         for idx, v in enumerate(vignettes, 1):
-            # Evaluate single case
             pred = _llm_triage(client, v["case_description"])
             gold = v["urgency_level"].strip().lower()
             correct = pred == gold
@@ -175,7 +163,6 @@ def run_benchmark(
             }
             results.append(rec)
             
-            # Update counters
             per_level_total[gold] += 1
             if correct:
                 per_level_correct[gold] += 1
@@ -192,7 +179,6 @@ def run_benchmark(
             
             completed += 1
             
-            # Call progress callback
             if progress_callback:
                 progress_callback({
                     "completed": completed,
