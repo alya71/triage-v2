@@ -1,10 +1,10 @@
+import os
 from logging import getLogger
 from time import sleep
 from typing import Dict, List, Optional
 
 from openai import OpenAI, RateLimitError
 
-from medask.const import KEY_OPENAI
 from medask.models.comms.models import CMessage
 from medask.models.orm.models import Lang, Role
 from medask.util.decorator import timeit
@@ -12,7 +12,7 @@ from medask.util.gen_cmsg import gen_cmsg
 from medask.ummon.base import BaseUmmon
 
 logger = getLogger("ummon.openai")
-client = OpenAI(api_key=KEY_OPENAI, timeout=40)
+client = OpenAI(api_key=os.environ.get("KEY_OPENAI", ""), timeout=40)
 
 
 class UmmonOpenAI(BaseUmmon):

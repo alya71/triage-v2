@@ -44,7 +44,7 @@ def create_client(model: str) -> BaseUmmon:
     - Together AI models: together+<model-name>
     """
     # OpenAI models
-    if model in {"o1", "o1-mini", "o3", "o3-mini", "o4-mini", "gpt-4o", "gpt-4.5-preview"}:
+    if model in {"o1", "o1-mini", "o3", "o3-mini", "o4-mini", "gpt-4o", "gpt-4.5-preview"} or model.startswith('gpt'):
         from medask.ummon.openai import UmmonOpenAI
         return UmmonOpenAI(model)
     

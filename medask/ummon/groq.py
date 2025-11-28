@@ -1,13 +1,10 @@
-"""
-Groq LLM provider for fast inference on open-source models.
-"""
+import os
 from logging import getLogger
 from time import sleep
 from typing import Dict, List, Optional
 
 from openai import OpenAI, RateLimitError
 
-from medask.const import KEY_GROQ
 from medask.models.comms.models import CMessage
 from medask.models.orm.models import Role
 from medask.util.decorator import timeit
@@ -15,7 +12,7 @@ from medask.util.gen_cmsg import gen_cmsg
 from medask.ummon.base import BaseUmmon
 
 logger = getLogger("ummon.groq")
-client = OpenAI(api_key=KEY_GROQ, timeout=60, base_url="https://api.groq.com/openai/v1")
+client = OpenAI(api_key=os.environ.get("KEY_GROQ", ""), timeout=60, base_url="https://api.groq.com/openai/v1")
 
 
 class UmmonGroq(BaseUmmon):

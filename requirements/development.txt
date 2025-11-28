@@ -7,3 +7,4 @@ requests==2.31.0
 tqdm
 statsmodels
 groq==0.36.0
+gradio
