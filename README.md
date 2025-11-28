@@ -11,6 +11,12 @@ python3 ui.py
 ```
 A local URL will be printed to terminal, open this in a browser to begin using. 
 
+## More Detailed Updates
+
+ui.py is written using Gradio, which I chose because Streamlit doesn't seem to have the function to have a progress bar, and it's simpler than React/Next.js. Currently, it's set up so that you can enter API keys either on the web interface, or by using the previous method (typing export KEY_{provider}="..." in terminal).  I used Groq to access the open source models since currently the free plan gives you decent access, albeit with [rate limits](https://console.groq.com/docs/rate-limits). 
+
+I also made a few improvements on the old code. Previously, you had to input an OpenAI key, even if you weren't using any of the OpenAI models. Now, you only have to input keys for the providers that you will use the models of. The old code also didn't work with the reasoning OAI models, and I made a small tweak so it does now. 
+
 ## Overview
 
 This repository contains multiple medical AI benchmarks developed by MedAsk to evaluate and compare the performance of LLMs on various medical tasks:
